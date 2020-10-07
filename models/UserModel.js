@@ -46,6 +46,18 @@ User.login = (email, password, callback = () => {}) => {
   });
 };
 
+User.findOne = (email, callback = () => {}) => {
+  db.query(`SELECT * FROM users WHERE email = '${email}'`, (err, result) => {
+    if (err) {
+      callback(err, null);
+      return;
+    }
+
+    //success
+    callback(null, result);
+  });
+};
+
 function validate(email, password) {
   if (!email) return "email is required";
   if (!password) return "password is required";
