@@ -1,0 +1,27 @@
+{
+  "name": "among-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NikolajHoggins/among-backend.git"
+  },
+  "author": "Hoggins",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NikolajHoggins/among-backend/issues"
+  },
+  "homepage": "https://github.com/NikolajHoggins/among-backend#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mysql2": "^2.2.5"
+  }
+}
