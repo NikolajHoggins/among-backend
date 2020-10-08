@@ -19,12 +19,15 @@
   "dependencies": {
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
+    "colors": "^1.4.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "faker": "^5.1.0",
     "jwt-simple": "^0.5.6",
     "mysql2": "^2.2.5",
     "passport": "^0.4.1",
-    "passport-http-bearer": "^1.0.1"
+    "passport-http-bearer": "^1.0.1",
+    "sqlstring": "^2.3.2"
   }
 }

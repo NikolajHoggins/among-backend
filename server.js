@@ -3,12 +3,14 @@ const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const User = require("./models/UserModel");
+const Swipe = require("./models/SwipeModel");
 const app = express();
 const passport = require("passport");
 const BearerStrategy = require("passport-http-bearer");
 const jwt = require("jwt-simple");
-dotenv.config();
+const Match = require("./models/MatchModel");
 const port = process.env.PORT || 3000;
+dotenv.config();
 
 // parse application/json
 app.use(bodyParser.json());
@@ -39,10 +41,21 @@ passport.use(
   })
 );
 
-//User stuff
+// User Endpoints
+app.get("/user", passport.authenticate("bearer", { session: false }), function (
+  req,
+  res,
+  next
+) {
+  res.json({ user: req.user });
+});
+
 app.post("/user/login", (req, res) => {
   User.login(req.body.email, req.body.password, (resp) => {
-    if (resp.error) res.json(resp);
+    if (resp.error) {
+      res.json(resp);
+      return;
+    }
 
     const token = jwt.encode(req.body.email, process.env.JWT_SECRET);
 
@@ -51,21 +64,53 @@ app.post("/user/login", (req, res) => {
 });
 
 app.post("/user/register", (req, res) => {
-  User.createUser(req.body.email, req.body.password, (resp) => {
+  const { email, password, age, description, picture } = req.body;
+  const user = { email, password, age, description, picture };
+  console.log(user);
+  User.createUser(user, (resp) => {
     res.json(resp);
   });
 });
 
-app.get("/", (req, res) => {
-  return res.status(200).json({ msg: "Successfull request to backend" });
-});
-
 app.get(
-  "/secure",
+  "/users/:take/:skip",
   passport.authenticate("bearer", { session: false }),
   function (req, res, next) {
-    // Get the authenticated user.
-    var user = req.user;
+    User.getPotentialMatches(
+      req.user.id,
+      req.params.take,
+      req.params.skip,
+      (resp) => res.json(resp)
+    );
+  }
+);
+
+// Swipe Endpoints
+app.post(
+  "/swipe",
+  passport.authenticate("bearer", { session: false }),
+  function (req, res, next) {
+    //TODO: Verify that swipe doesn't already exist, in this case, update instead
+    Swipe.createSwipe(req.user, req.body.swiped_id, req.body.action, (resp) => {
+      if (req.body.action === "like") {
+        Match.checkMatch(resp.swipe_id, (resp) => {
+          res.json(resp);
+        });
+      } else {
+        res.json(resp);
+      }
+    });
+  }
+);
+// Swipe inner join
+
+// Match Endpoints
+app.get(
+  "/matches",
+  passport.authenticate("bearer", { session: false }),
+  function (req, res, next) {
+    const user = req.user;
+
     res.json({ status: "success", user });
     // Route implementation here...
   }
@@ -73,15 +118,4 @@ app.get(
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
-});
-
-//Middleware to check api key
-app.use(function (req, res, next) {
-  //   if (!req.headers.authorization) {
-  //     return res.status(403).json({ error: "No credentials sent!" });
-  //   }
-  //   if (req.headers.authorization !== process.env.API_KEY) {
-  //     return res.status(403).json({ error: "Invalid credentials" });
-  //   }
-  next();
 });
