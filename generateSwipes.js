@@ -16,8 +16,11 @@ const loops = 50;
 let errors = 0;
 db.query(`SELECT * FROM users WHERE NOT id = 1;`, (err, result) => {
   let query = `INSERT INTO swipes(user_id, user_swiped_id, action) VALUES `;
+
   result.forEach((user) => {
-    query += `(${user.id}, 1, 'like'),`;
+    if (faker.random.number({ min: 0, max: 5 }) === 3) {
+      query += `(${user.id}, 1, 'like'),`;
+    }
   });
 
   query = query.slice(0, -1) + ";";

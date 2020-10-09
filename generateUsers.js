@@ -21,7 +21,7 @@ for (i = 0; i < loops; i++) {
   const picture =
     images[faker.random.number({ min: 0, max: images.length - 1 })];
   const description = faker.commerce.productDescription();
-  console.log(picture?.blue);
+
   bcrypt.hash("password", 10, function (err, hash) {
     try {
       db.query(
