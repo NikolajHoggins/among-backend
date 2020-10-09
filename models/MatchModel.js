@@ -30,7 +30,6 @@ Match.checkMatch = (swipe_id, callback = (resp) => {}) => {
       `SELECT * FROM swipes WHERE user_id = ${result[0].user_swiped_id} AND user_swiped_id = ${result[0].user_id}`,
       (err, result) => {
         if (result[0]) {
-          console.log(result);
           Match.createMatch(
             result[0].user_swiped_id,
             result[0].user_id,
@@ -47,19 +46,27 @@ Match.checkMatch = (swipe_id, callback = (resp) => {}) => {
 };
 
 Match.getMatches = (user_id, callback = () => {}) => {
-  db.query(`SELECT * FROM swipes WHERE id = ${swipe_id}`, (err, result) => {
-    db.query(
-      `SELECT * FROM swipes WHERE user_id = ${result[0].user_swiped_id} AND user_swiped_id = ${result[0].user_id}`,
-      (err, result) => {
-        if (result) {
-          callback({ status: "success" });
-        }
-        console.log(result);
-        console.log(err);
-        callback({ result });
+  db.query(
+    `SELECT * FROM matches WHERE user_id = ${user_id} OR user_2_id = ${user_id};`,
+    (err, result) => {
+      let query = "SELECT * FROM users WHERE ";
+      if (result.length === 0) {
+        callback({ result: "success", data: "no matches" });
+        return;
       }
-    );
-  });
+      result.forEach((match) => {
+        const match_user =
+          match.user_id !== user_id ? match.user_id : match.user_2_id;
+        query += `id = ${match_user} OR `;
+      });
+
+      query = query.slice(0, -4) + ";";
+
+      db.query(query, (err, result) => {
+        callback({ result: "success", data: result });
+      });
+    }
+  );
 };
 
 module.exports = Match;

@@ -109,9 +109,10 @@ app.get(
   "/matches",
   passport.authenticate("bearer", { session: false }),
   function (req, res, next) {
-    const user = req.user;
+    Match.getMatches(req.user.id, (resp) => {
+      res.json(resp);
+    });
 
-    res.json({ status: "success", user });
     // Route implementation here...
   }
 );
